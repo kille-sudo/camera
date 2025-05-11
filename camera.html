@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>گرفتن عکس از دوربین و ارسال به سایت</title>
+</head>
+<body>
+    <h2>برای گرفتن عکس از دوربین اجازه دهید</h2>
+    <video id="video" width="640" height="480" autoplay></video>
+    <button id="capture">گرفتن عکس</button>
+    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+
+    <script>
+        // درخواست دسترسی به دوربین
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                var video = document.getElementById('video');
+                video.srcObject = stream;
+            })
+            .catch(function (error) {
+                console.log('خطا در دسترسی به دوربین:', error);
+            });
+
+        // گرفتن عکس از دوربین هنگام کلیک روی دکمه
+        document.getElementById('capture').addEventListener('click', function () {
+            var video = document.getElementById('video');
+            var canvas = document.getElementById('canvas');
+            var context = canvas.getContext('2d');
+
+            // رسم فریم ویدیویی روی canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // تبدیل تصویر به داده base64
+            var dataUrl = canvas.toDataURL();
+
+            // ارسال تصویر به سایت خود (استفاده از API یا فرم)
+            fetch("https://eop77h2vm4imb0u.m.pipedream.net", {  // آدرس سرور سایت شما
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ image: dataUrl })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('تصویر با موفقیت ارسال شد:', data);
+            })
+            .catch(error => {
+                console.log('خطا در ارسال تصویر:', error);
+            });
+        });
+    </script>
+</body>
+</html>
